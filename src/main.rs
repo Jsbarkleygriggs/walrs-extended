@@ -3,6 +3,8 @@ mod get_colors;
 mod reload;
 mod theme;
 mod utils;
+
+#[cfg(feature = "wallpaper")]
 mod wallpaper;
 
 use argh::FromArgs;
@@ -26,14 +28,6 @@ struct Arg {
         description = "reload without changing the wallpaper"
     )]
     reload: bool,
-
-    #[argh(
-        switch,
-        short = 'R',
-        long = "reload-no",
-        description = "will be removed in the next update; use -w instead"
-    )]
-    reload_no: bool,
 
     #[argh(
         option,
@@ -105,17 +99,6 @@ fn main() {
     // print the version
     if arg.version {
         info("Version", env!("CARGO_PKG_VERSION"), send);
-        exit(0);
-    }
-
-    // this will be removed next update
-    if arg.reload_no {
-        warning(
-            "Reload",
-            "this will be removed in the next update, use -W instead",
-            send,
-        );
-        reload(send, true, arg.run_scripts.unwrap_or(false));
         exit(0);
     }
 

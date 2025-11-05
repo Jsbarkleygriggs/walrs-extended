@@ -37,21 +37,45 @@ fn generate_variation(color: (u8, u8, u8), offset: i16) -> (u8, u8, u8) {
     adjust_rgb(color.0, color.1, color.2, offset, 50)
 }
 
+fn download_image(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let response = reqwest::blocking::get(url)?;
+    let bytes = response.bytes()?;
+    Ok(bytes.to_vec())
+}
+
 pub fn get_colors(
     image_path: &str,
     send: bool,
     brightness: Option<i16>,
     saturation: Option<i16>,
 ) -> (Vec<(u8, u8, u8)>, u8) {
-    let core_image = match image::open(image_path) {
-        Ok(img) => img,
-        Err(_) => {
-            let data = read(image_path).unwrap();
-            match image::guess_format(&data) {
-                Ok(fmt) => image::load_from_memory_with_format(&data, fmt).unwrap(),
+    let core_image = if image_path.starts_with("http://") || image_path.starts_with("https://") {
+        // Download the image from URL
+        match download_image(image_path) {
+            Ok(data) => match image::load_from_memory(&data) {
+                Ok(img) => img,
                 Err(_) => {
-                    warning("Image", "Unsupported or corrupted image format", send);
+                    warning("Image", "Failed to load image from URL", send);
                     exit(1);
+                }
+            },
+            Err(e) => {
+                warning("Image", &format!("Failed to download image: {}", e), send);
+                exit(1);
+            }
+        }
+    } else {
+        // Handle local files as before
+        match image::open(image_path) {
+            Ok(img) => img,
+            Err(_) => {
+                let data = read(image_path).unwrap();
+                match image::guess_format(&data) {
+                    Ok(fmt) => image::load_from_memory_with_format(&data, fmt).unwrap(),
+                    Err(_) => {
+                        warning("Image", "Unsupported or corrupted image format", send);
+                        exit(1);
+                    }
                 }
             }
         }
@@ -155,3 +179,4 @@ pub fn get_colors(
     done[15] = (r, g, b);
     (done, *alpha)
 }
+

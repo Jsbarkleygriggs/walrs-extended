@@ -1,6 +1,7 @@
 ![walrs logo](https://i.imgur.com/BORMhHc.png){align="right" height="200"}
 
-## This is a fork of https://github.com/Pixel2175/walrs
+
+This is a fork of [walrs](https://github.com/Pixel2175/walrs) with added modularity and handling for remote files for use with [wayvy](https://codeberg.org/J_S_Barkely-Griggs/Wayvy.git).
 
 ### walrs
 
@@ -16,9 +17,18 @@ prefer simplicity and speed. Report issues or bugs on GitHub. Full
 ## Usage:
 see man walrs
 
-### Install
+## Install
+### For general purpose users:
 ```
 $ git clone https://github.com/jsbarkleygriggs/walrs.git
 $ cd walrs
 $ make install
 ```
+### For Wayvy users:
+```
+$ git clone https://github.com/jsbarkleygriggs/walrs.git
+$ cd walrs
+$ make FEATURES="colors" install
+```
+
+If ~/.cache/wal/colors is not generated, the script will not fuction properly.

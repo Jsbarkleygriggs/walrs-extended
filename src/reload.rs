@@ -1,10 +1,12 @@
 use crate::utils::{get_cache, get_config, info, run, share_files, warning};
-use crate::wallpaper::change_wallpaper;
 use std::fs::{create_dir_all, OpenOptions};
 use std::fs::{read_dir, read_to_string};
 use std::io::Write;
 use std::path::Path;
 use std::process::exit;
+
+#[cfg(feature = "wallpaper")]
+use crate::wallpaper::change_wallpaper;
 
 fn colors(colors: Vec<String>, send: bool) {
     for i in read_dir("/dev/pts/").unwrap_or_else(|_| {
@@ -71,6 +73,7 @@ pub fn reload(send: bool, set_wal: bool, run_scripts: bool) {
         .collect();
 
     // applie the wallpaper
+    #[cfg(feature = "wallpaper")]
     if !set_wal {
         change_wallpaper(&get_wallpaper(&cache.clone(), send.clone()), send.clone())
     }
@@ -103,7 +106,7 @@ pub fn reload(send: bool, set_wal: bool, run_scripts: bool) {
                         continue;
                     };
                     if !run(&format!(
-                        "bash {}",
+                        "timeout 2 bash {}",
                         &script.canonicalize().unwrap().to_string_lossy()
                     )) {
                         warning(

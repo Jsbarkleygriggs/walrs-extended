@@ -1,7 +1,10 @@
+FEATURES ?= wallpaper colors
+
+
 all: build
 
 build:
-	cargo build --release
+	cargo build --release --features="$(FEATURES)"
 
 install: build
 	sudo install -m755 target/release/walrs /usr/bin/walrs

@@ -9,32 +9,40 @@ pub fn share_files() -> PathBuf {
 
 pub fn image_path(image: Option<String>, send: bool) -> String {
     match image {
-        Some(ref v) if Path::new(v).exists() => match get_absolute_path(v) {
-            Some(p) => {
-                if Path::new(&p).is_file() {
-                    p
-                } else {
-                    std::str::from_utf8(
-                        &std::process::Command::new("sh")
-                            .arg("-c")
-                            .arg(format!("find \"{p}\" -type f | sort -R | head -n1"))
-                            .output()
-                            .unwrap()
-                            .stdout,
-                    )
-                    .unwrap()
-                    .trim()
-                    .to_string()
-                }
+        Some(ref v) => {
+            // Check if it's a URL
+            if v.starts_with("http://") || v.starts_with("https://") {
+                return v.clone();
             }
-            None => {
-                warning("Wallpaper", "Can't find wallpaper absolute path!", send);
+            // Check if it's a local file path
+            if Path::new(v).exists() {
+                match get_absolute_path(v) {
+                    Some(p) => {
+                        if Path::new(&p).is_file() {
+                            p
+                        } else {
+                            std::str::from_utf8(
+                                &std::process::Command::new("sh")
+                                    .arg("-c")
+                                    .arg(format!("find \"{p}\" -type f | sort -R | head -n1"))
+                                    .output()
+                                    .unwrap()
+                                .stdout,
+                            )
+                                .unwrap()
+                                .trim()
+                                .to_string()
+                        }
+                    }
+                    None => {
+                        warning("Wallpaper", "Can't find wallpaper absolute path!", send);
+                        exit(1);
+                    }
+                }
+            } else {
+                warning("Image", "Image does not exist", send);
                 exit(1);
             }
-        },
-        Some(_) => {
-            warning("Image", "Image does not exist", send);
-            exit(1);
         }
         None => {
             warning("Image", "Can't find Image", send);
