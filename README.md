@@ -14,9 +14,6 @@ just an app to set your wallpaper. If you\'re using pywal, you only need
 to replace the \`wal\` command with \`walrs\`. Designed for users who
 prefer simplicity and speed. Report issues or bugs on GitHub. Full
 
-## Usage:
-see man walrs
-
 ## Install
 ### For general purpose users:
 ```
@@ -31,4 +28,14 @@ $ cd walrs
 $ make FEATURES="colors" install
 ```
 
+## Usage:
+see man walrs
+
 If ~/.cache/wal/colors is not generated, the script will not fuction properly.
+
+### Supported formats:
+Local and remote files,\
+*In theory:*\
+bmp, dxt, flat, gif, hdr, ico, imageops, jpeg, math, png, pnm, tga, tiff, webp\
+**tested:**\
+gif, png, jpeg
